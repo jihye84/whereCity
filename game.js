@@ -1,4 +1,5 @@
-const cities = [
+let cities=[];
+const cities0 = [
   { name: "서울", lat: 37.5665, lng: 126.9780, description: "대한민국의 수도이자 최대 도시" },
   { name: "부산", lat: 35.1796, lng: 129.0756, description: "한국의 남쪽에 위치한 항구 도시" },
   { name: "인천", lat: 37.4563, lng: 126.7052, description: "서울 인근 대도시로 인천국제공항이 위치함" },
@@ -39,17 +40,23 @@ const cities = [
 ];
 
 
+
+
+
+
+
+
 let map;
 let playerMarker;
 let answerMarker;
 let currentCity;
 let currentCityPosition;
-let score = 0;
-let totalQuestions = 0;
-let correctAnswers = 0;
+let score;
+let totalQuestions;
 let cityDescription = null;
 let infoWindow;
 let cNumber = 0;
+let level = 1;
 
 
 function shuffleArray(array) {
@@ -59,7 +66,15 @@ function shuffleArray(array) {
   }
 }
 
+
+
 function initMap() {
+  score = 0;
+  totalQuestions = 0;
+
+  cities = cities0;
+
+
   shuffleArray(cities);
 
 
@@ -178,6 +193,15 @@ function initMap() {
 
 }
 
+function showMessage(text) {
+  document.getElementById('messageText').innerHTML = text;
+  document.getElementById('messageBox').style.display = 'block';
+}
+
+function hideMessage() {
+  document.getElementById('messageBox').style.display = 'none';
+}
+
 
 
 function nextQuestion() {
@@ -248,26 +272,27 @@ function checkAnswer() {
 
 
   let targetZoom;
+  const roundedDistance = Math.round(distance * 1000) / 1000;
 
   if (distance < 50000) {
     score += 5;
     targetZoom = 8;
-    document.getElementById("alarm").innerText = "정확한 위치! +5점";
+    document.getElementById("alarm").innerHTML = distance.toFixed(0) + "km 밖에 차이가 안납니다!정확한 위치! +5점";
   } else if (distance < 200000) {
     score += 4;
     targetZoom = 7;
-    document.getElementById("alarm").innerText = "아주 근접했어요! +4점";
+    document.getElementById("alarm").innerHTML = roundedDistance.toFixed(0) + "km 밖에 차이가 안납니다! 아주 근접했어요! +4점";
   } else if (distance < 400000) {
     score += 3;
     targetZoom = 6;
-    document.getElementById("alarm").innerText = "꽤 가깝네요~! +3점";
+    document.getElementById("alarm").innerHTML = roundedDistance.toFixed(0) + "km 밖에 차이가 안납니다! 꽤 가깝네요~! +3점";
   } else if (distance < 500000) {
     score += 2;
     targetZoom = 6;
-    document.getElementById("alarm").innerText = "좀 더 정확히 알아봐요~! +2점";
+    document.getElementById("alarm").innerHTML = roundedDistance.toFixed(0) + "km 정도 차이가 나네요~! 좀 더 정확히 알아봐요~! +2점";
   } else {
     score += 2;
-    document.getElementById("alarm").innerText = "위치를 확인해보세요~! +1점";
+    document.getElementById("alarm").innerHTML = roundedDistance.toFixed(0) + "km 정도 차이가 나네요~! 위치를 확인해보세요~! +1점";
 
 
 
@@ -324,21 +349,68 @@ function checkAnswer() {
   */
 
 
-  //const duration = 2000; // 애니메이션 지속 시간 (밀리초 단위)
-  //animatePanAndZoom(map, currentCityPosition, targetZoom, duration);
-
-  /*
-  if (playerMarker) {
-    animatePanAndZoom(map, midPoint, targetZoom, 1000);
-  }
-  // playerMarker가 존재하지 않는 경우
-  else {
-    animatePanAndZoom(map, currentCityPosition, 3, 1000);
-  }
-
-  */
+  pauseGame();
 
 }
+function pauseGame() {
+  if (totalQuestions >= 2) {
+    if (score >= 4) {
+      level++;
+
+      setTimeout(function () {
+        showMessage("축하합니다! " + score + "점을 얻었습니다!");   
+           
+        document.getElementById('nextLevel').style.display = 'block';
+        document.getElementById('exitGame').style.display = 'block';
+      }, 3000);
+
+
+
+    } else {
+      setTimeout(function () {
+        showMessage("아쉽네요! " + score + "점을 얻었습니다. 다시 시도해주세요!");
+        document.getElementById('tryAgain').style.display = 'block';
+        document.getElementById('exitGame').style.display = 'block';
+      }, 3000);
+
+    }
+  }
+
+  document.getElementById('nextLevel').addEventListener('click', function () {
+    document.getElementById('nextLevel').style.display = 'none';
+    document.getElementById('exitGame').style.display = 'none';
+
+    showMessage("레벨이 올랐습니다! 현재 레벨:" + level);
+
+
+    setTimeout(function () {
+      // 3초 후 실행될 코드 작성
+      hideMessage();
+      initMap();
+      //nextQuestion();      
+    }, 3000);
+  });
+
+  document.getElementById('exitGame').addEventListener('click', function () {
+
+    hideMessage();
+
+    window.close();
+
+
+  });
+
+  document.getElementById('tryAgain').addEventListener('click', function () {
+    setTimeout(function () {
+      // 3초 후 실행될 코드 작성
+      hideMessage();
+      initMap();
+      nextQuestion();
+      cNumber = 0;
+    }, 3000);
+  });
+}
+
 
 function updateScoreboard() {
 
@@ -346,11 +418,13 @@ function updateScoreboard() {
   const totalScoreElement = document.getElementById('total-score');
   const percentageElement = document.getElementById('percentage');
   const totalQuestionElement = document.getElementById('total-question');
+  const levelElement = document.getElementById('level');
 
   totalQuestionElement.textContent = cNumber;
   currentScoreElement.textContent = score;
   totalScoreElement.textContent = totalQuestions * 5;
   percentageElement.textContent = ((score / (totalQuestions * 5)) * 100).toFixed(2);
+  levelElement.textContent = level;
 }
 
 function animatePanAndZoom(map, targetLatLng, targetZoom, duration) {
