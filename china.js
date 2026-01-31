@@ -24,7 +24,6 @@ let cities = [
     { name: "심양", lat: 22.5370, lng: 114.1115, description: "중국의 남동부에 위치한 도시로, 심양새공원, 오오타이산, 심양광장 등 아름다운 도시 경치와 명소가 있는 도시입니다." },
     { name: "서두안저우", lat: 30.5763, lng: 104.0734, description: "중국의 서남부에 위치한 도시로, 청순사, 이화문, 레춘씨 공원 등 다양한 명소와 아름다운 자연 경치를 자랑하는 도시입니다." },
     { name: "성도", lat: 31.1667, lng: 121.4667, description: "중국의 동북부에 위치한 도시로, 도쿄 디즈니 랜드, 푸데산, 황산 등 자연과 역사적인 명소가 있는 도시입니다." },
-    { name: "진주", lat: 36.8145, lng: 118.0476, description: "중국 동북부에 위치한 도시로, 청도산, 분룡동, 원불산 등 아름다운 자연 경치와 역사적인 명소를 갖고 있는 도시입니다." }
 ];
 
 
@@ -469,5 +468,6 @@ function animatePanAndZoom(map, targetLatLng, targetZoom, duration) {
 
     requestAnimationFrame(animate);
 }
+
 
 
